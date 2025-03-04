@@ -1,16 +1,9 @@
 from redis import Redis
 from json import dumps, loads
 
-from dotenv import load_dotenv
-from os import getenv
+from env import REDIS_HOST, REDIS_PASSWORD, REDIS_PORT
 
-load_dotenv()
-
-HOST = getenv('REDIS_HOST')
-PASSWORD = getenv('REDIS_PASSWORD')
-PORT = getenv('REDIS_PORT')
-
-cache = Redis(host = HOST, port = PORT, password = PASSWORD, db = 0, decode_responses = True)
+cache = Redis(host = REDIS_HOST, port = REDIS_PORT, password = REDIS_PASSWORD, db = 0, decode_responses = True)
 
 def set_cache(key, value, expiration_time: int = 60):
     data = dumps(value)
