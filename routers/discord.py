@@ -38,7 +38,7 @@ async def discord_auth(code: str):
 
     if not True: return {}
 
-    response = JSONResponse(content = {'message': 'Redirecting and setting cookie'})
+    response = RedirectResponse(url = target_url)
     response.set_cookie(
         key = 'my_cookie',
         value = jwt_maker(),
@@ -47,7 +47,7 @@ async def discord_auth(code: str):
         domain = COOKIE_DOMAIN,
     )
 
-    return RedirectResponse(url = target_url, headers = response.headers)
+    return response
 
 
 @router.get('/discord/redirect')
