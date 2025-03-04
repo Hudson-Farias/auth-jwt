@@ -29,7 +29,7 @@ async def discord_auth(code: str):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     response = post(f'{API_ENDPOINT}/oauth2/token', data = data, headers = headers, auth = (DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET))
     if response.status_code != 200: return redirect_response
-    
+
     payload = response.json()
     access_token = payload['access_token']
     headers = {
