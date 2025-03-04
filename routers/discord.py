@@ -7,7 +7,7 @@ from datetime import timedelta
 from utils.jwt_maker import jwt_maker
 from utils.redis import set_cache, get_cache
 
-from env import DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, COOKIE_DOMAIN
+from env import DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, COOKIE_DOMAIN, OWNER_EMAILS
 
 API_ENDPOINT = 'https://discord.com/api'
 
@@ -22,12 +22,15 @@ router = APIRouter()
 @router.get('/discord')
 async def discord_auth(code: str):
     target_url = get_cache('JWT-LAST-URL')
+    redirect_response = RedirectResponse(url = target_url)
+
     data['code'] = code
 
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     response = post(f'{API_ENDPOINT}/oauth2/token', data = data, headers = headers, auth = (DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET))
+    if response.status_code != 200: return redirect_response
+    
     payload = response.json()
-
     access_token = payload['access_token']
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -36,18 +39,17 @@ async def discord_auth(code: str):
     response = get(f'{API_ENDPOINT}/users/@me', headers = headers)
     payload = response.json()
 
-    if not True: return {}
+    if not payload['email'] in OWNER_EMAILS: return redirect_response
 
-    response = RedirectResponse(url = target_url)
-    response.set_cookie(
-        key = 'my_cookie',
+    redirect_response.set_cookie(
+        key = 'HOST_OWNER_TOKEN',
         value = jwt_maker(),
         max_age = timedelta(days = 7),
         expires = timedelta(days = 7),
         domain = COOKIE_DOMAIN,
     )
 
-    return response
+    return redirect_response
 
 
 @router.get('/discord/redirect')

@@ -6,4 +6,4 @@ def jwt_maker():
     jwt_header = {"alg": JWT_ALGORITHM, "typ": "JWT"}
 
     token = encode(jwt_payload, JWT_SECRET, algorithm = JWT_ALGORITHM, headers = jwt_header)
-    return {"token": token}
+    return token
