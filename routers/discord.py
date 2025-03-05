@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from httpx import get, post
 from datetime import timedelta
 
-from utils.jwt_maker import jwt_maker
+from utils.jwt import jwt_maker
 from utils.redis import set_cache, get_cache
 
 from env import DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, COOKIE_DOMAIN, OWNER_EMAILS
@@ -46,7 +46,7 @@ async def discord_auth(code: str):
         value = jwt_maker(),
         max_age = timedelta(days = 7),
         expires = timedelta(days = 7),
-        domain = COOKIE_DOMAIN,
+        domain = COOKIE_DOMAIN
     )
 
     return redirect_response
